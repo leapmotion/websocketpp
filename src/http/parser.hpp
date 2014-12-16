@@ -69,7 +69,7 @@ public:
     }
     
     std::string header(const std::string& key) const {
-        header_list::const_iterator h = m_headers.find(key);
+        header_list::const_iterator h = m_headers.find(camel_case(key));
         
         if (h == m_headers.end()) {
             return "";
@@ -82,19 +82,20 @@ public:
     // use replace_header if you do not want this behavior.
     void add_header(const std::string &key,const std::string &val) {
         // TODO: prevent use of reserved headers?
-        if (this->header(key) == "") {
-            m_headers[key] = val;
+        const std::string camel_case_key = camel_case(key);
+        if (this->header(camel_case_key) == "") {
+            m_headers[camel_case_key] = val;
         } else {
-            m_headers[key] += ", " + val;
+            m_headers[camel_case_key] += ", " + val;
         }
     }
     
     void replace_header(const std::string &key,const std::string &val) {
-        m_headers[key] = val;
+        m_headers[camel_case(key)] = val;
     }
     
     void remove_header(const std::string &key) {
-        m_headers.erase(key);
+        m_headers.erase(camel_case(key));
     }
 protected:
     bool parse_headers(std::istream& s) {
@@ -133,6 +134,28 @@ protected:
 private:
     std::string m_version;
     header_list m_headers;
+
+    static std::string camel_case(const std::string& str) {
+      std::string camel;
+      camel.reserve(str.size());
+      bool upper = true;
+      for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+        char c = *it;
+        if (upper) {
+          if (c >= 'a' && c <= 'z') {
+            c = c + 'A' - 'a';
+          }
+          upper = false;
+        } else if (c >= 'A' && c <= 'Z') {
+          c = c + 'a' - 'A';
+        }
+        camel.push_back(c);
+        if (c == '-') {
+          upper = true;
+        }
+      }
+      return camel;
+    }
 };
 
 class request : public parser {
