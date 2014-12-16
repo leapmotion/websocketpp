@@ -35,6 +35,9 @@
 // TODO: impliment stuff from here: 
 // http://stackoverflow.com/questions/809902/64-bit-ntohl-in-c
 
+#undef htonll
+#undef ntohll
+
 namespace zsutil {
 
 #define TYP_INIT 0 

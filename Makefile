@@ -143,7 +143,11 @@ else
 $(lib_target): banner installdirs $(addprefix $(objdir)/, $(objects))
 	@echo "Archive"
 	cd $(objdir) ; \
-	$(AR) -cvq $@ $(objects) ; \
+	if test "$(OS)" = "Darwin" ; then \
+		libtool -static -o $@ $(objects) ; \
+	else \
+		$(AR) -cvq $@ $(objects) ; \
+	fi ; \
 	mv -f $@ ../
 	@echo "Archive: Done"
 endif
